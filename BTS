@@ -1,0 +1,231 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//* searchBTS(Node* root, char x);
+//Node* insertBTS(Node* root, char x);
+//void Inorder(Node* root);
+
+//typedef char Data;
+typedef int data;
+
+typedef struct _Node
+{
+	//Data key;
+	data key;
+	struct _Node* right;
+  	struct _Node* left;
+}Node;
+
+
+
+
+//Node* SearchNode(Node* root, char x)
+Node* searchBTS(Node* root, int x)
+{
+	Node* p = root;
+
+	while (p != NULL)
+	{
+		if (p->key == x)
+		{
+			return p;
+		}
+		else if (p->key < x)
+		{
+			p = p->right;
+		}
+		else
+		{
+			p = p->left;
+		}
+	}
+	return NULL;
+}
+
+//Node* InsertNode(Node* root, char x)
+Node* insertBTS(Node* root, int x)
+{
+	Node* p = root;
+	Node* parent = NULL;
+
+
+	while (p != NULL)
+	{
+		parent = p;
+		if (p->key == x)
+		{
+			//printf("같은 키가 존재\n");
+			printf("같은 키가 있습니다.\n");
+			return p;
+		}
+		else if (p->key < x)
+		{
+			p = p->right;
+		}
+		else
+		{
+			p = p->left;
+		}
+	}
+	//새 노드 할당
+	//Node* NewNode = (Node*)malloc(sizeof(Node));
+	Node* newNode = (Node*)malloc(sizeof(Node));
+	//NewNode->key = x;
+	newNode->key = x;
+	//NewNode->left = NULL;
+	//NewNode->right = NULL;
+	newNode->left = newNode->right = NULL;
+
+	//parent의 자식으로 새 노드 붙이기
+	if (parent != NULL)
+	{
+		//if (parent->key < NewNode->key)
+		if(parent->key < newNode->key)
+		{
+			//parent->right = NewNode;
+			parent->right = newNode;
+		}
+		else
+		{
+			//parent->left = NewNode;
+			parent->left = newNode;
+		}
+	}
+	//삽입한 노드가 루트 노드인 경우
+	else
+	{
+		root = newNode;
+	}
+	return newNode;
+}
+
+Node* deleteNode(Node* root, int x)
+{
+	Node* p = root;
+	Node* parent = NULL;
+
+	while (p != NULL && p->key != x)
+	{
+		parent = p;
+		if (p->key == x)
+		{
+			printf("삭제할 Key를 찾았다.\n");
+		}
+		else if (p->key < x)
+		{
+			p = p->right;
+		}
+		else
+		{
+			p = p->left;
+		}
+	}
+	if (p == NULL)
+	{
+		printf("찾는 노드가 없습니다.\n");
+		return root;
+	}
+
+	if (p->left == NULL && p->right == NULL)		//차수가 0
+	{
+		if (parent == NULL)
+		{
+			root = NULL;
+		}
+		else
+		{
+			if (parent->left == p)
+			{
+				parent->left = NULL;
+			}
+			else
+			{
+				parent->right = NULL;
+			}
+		}
+	}
+	else if (p->left == NULL || p->right == NULL)		//차수가 1인 경우
+	{
+		Node* child = (p->left != NULL) ? p->left : p->right;		//지울 노드가 가지고 있는 하나의 자식노드를 child에 저장함
+		if (parent == NULL)		//지울 노드가 루트 노드인 경우
+		{
+			root = child;
+		}
+		else
+		{
+			if (parent->left == p)
+			{
+				parent->left = child;
+			}
+			else
+			{
+				parent->right = child;
+			}
+		}
+	}
+	else		//차수가 2인 경우
+	{
+		Node* succ_parent = p;
+		Node* succ = p->right;
+		while (succ->left != NULL)
+		{
+			succ_parent = succ;
+			succ = succ->left;
+		}
+		p->key = succ->key;
+		if (succ_parent->left == succ)
+		{
+			succ_parent->left = succ->right;
+		}
+		else
+		{
+			succ_parent->right = succ->right;
+		}
+		p = succ;
+		return root;		//바뀠을 수도 있을 root값을 반환함
+	}
+	free(p);
+}
+
+void Inorder(Node* root)
+{
+	if (root == NULL)
+	{
+		return;
+	}
+	Inorder(root->left);
+	printf("%c ", root->key);
+	Inorder(root->right);
+}
+int main()
+{
+
+	Node* root = insertBTS(NULL, '7');
+
+	insertBTS(root, '6');
+	insertBTS(root, '3');
+	insertBTS(root, '9');
+	insertBTS(root, '2');
+	insertBTS(root, '5');
+	insertBTS(root, '8');
+
+	Inorder(root); printf("\n");
+	deleteNode(root, '6');
+	Inorder(root); printf("\n");
+	deleteNode(root, '3');
+	Inorder(root); printf("\n");
+	deleteNode(root, '7');
+	Inorder(root); printf("\n");
+	deleteNode(root, '9');
+	Inorder(root); printf("\n");
+	deleteNode(root, '2');
+	Inorder(root); printf("\n");
+	deleteNode(root, '5');
+	Inorder(root); printf("\n");
+	deleteNode(root, '8');
+	Inorder(root); printf("\n");
+	Inorder(root); printf("\n");
+	
+	return 0;
+
+}
